@@ -11,8 +11,8 @@ public class OrientationSensor implements SensorEventListener {
     private Sensor accelerometer, magneticField;
     private float[] accData = null;
     private float[] magData = null;
-    private int pitch;
-    private int roll;
+    private double pitch;
+    private double roll;
     private OrientationChangeListener orientationChangeListener;
 
     OrientationSensor(Context context) {
@@ -21,16 +21,16 @@ public class OrientationSensor implements SensorEventListener {
         magneticField = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
     }
 
-    void setOrientationChangeListener(OrientationChangeListener orientationChangeListener) {
+    void registerOrientationChangeListener(OrientationChangeListener orientationChangeListener) {
         this.orientationChangeListener = orientationChangeListener;
     }
 
-    void registerListener() {
+    void registerListeners() {
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
         sensorManager.registerListener(this, magneticField, SensorManager.SENSOR_DELAY_GAME);
     }
 
-    void unregisterListener() {
+    void unregisterListeners() {
         sensorManager.unregisterListener(this);
     }
 
@@ -38,8 +38,8 @@ public class OrientationSensor implements SensorEventListener {
     public void onSensorChanged(SensorEvent event) {
         float[] rotationMatrix = new float[9];
         float[] values = new float[3];
-        int prePitch = pitch;
-        int preRoll = roll;
+        double prePitch = pitch;
+        double preRoll = roll;
 
         switch (event.sensor.getType()) {
             case Sensor.TYPE_ACCELEROMETER:
@@ -53,8 +53,8 @@ public class OrientationSensor implements SensorEventListener {
         if (accData != null && magData != null) { // 들어온 값으로 기기의 방향을 계산해주는 과정
             SensorManager.getRotationMatrix(rotationMatrix, null, accData, magData);
             SensorManager.getOrientation(rotationMatrix, values);
-            pitch = (int) Math.toDegrees(values[1]);
-            roll = (int) Math.toDegrees(values[2]);
+            pitch = Math.toDegrees(values[1]);
+            roll = Math.toDegrees(values[2]);
         }
 
         if (prePitch != pitch || preRoll != roll) {
