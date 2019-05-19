@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.text.MessageFormat;
+
 public class MainActivity extends AppCompatActivity implements OrientationChangeListener, GameResultListener {
     OrientationSensor orientationSensor;
     SensorGameView sensorGameView;
@@ -14,6 +16,7 @@ public class MainActivity extends AppCompatActivity implements OrientationChange
     TextView count;
     CountDownTimer countDownTimer;
     Handler handler;
+    boolean gameOver = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +45,12 @@ public class MainActivity extends AppCompatActivity implements OrientationChange
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        count.setText(String.valueOf(secondsUntilFinished));
+                        if (!gameOver)
+                            count.setText(String.valueOf(secondsUntilFinished));
+                        else {
+                            terminateGame(secondsUntilFinished);
+                            cancel();
+                        }
                     }
                 });
             }
@@ -80,20 +88,11 @@ public class MainActivity extends AppCompatActivity implements OrientationChange
 
     @Override
     public void onGameOver() {
-        try {
-            countDownTimer.cancel();
-        } catch (Exception e) {
-            countDownTimer = null;
-        }
-        handler.post(new Runnable() {
-            CharSequence charSequence;
+        gameOver = true;
+        container.removeAllViews();
+    }
 
-            @Override
-            public void run() {
-                container.removeAllViews();
-                charSequence = count.getText();
-                count.setText(String.format("병이 깨졌습니다. 버틴 시간 : %s초", charSequence));
-            }
-        });
+    public void terminateGame(int secondsUntilFinished) {
+        count.setText(MessageFormat.format("병이 깨졌습니다. 남은 시간 : {0}초", secondsUntilFinished));
     }
 }

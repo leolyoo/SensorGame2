@@ -54,12 +54,10 @@ public class SensorGameView extends View {
     }
 
     public void updateDst(double pitch, double roll) {
-        dstX = dstX + roll;
-        dstY = dstY - pitch;
-
         int distanceFromCenter = (int) Math.sqrt(Math.pow(Math.abs(viewCenterX - dstX), 2) + Math.pow(Math.abs(viewCenterY - dstY), 2));
-
         if (distanceFromCenter <= bgDstRadius) {
+            dstX = dstX + roll;
+            dstY = dstY - pitch;
             invalidate();
         } else {
             gameResultListener.onGameOver();
